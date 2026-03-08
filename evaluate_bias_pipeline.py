@@ -17,8 +17,8 @@ if not api_key or api_key == "your_api_key_here":
 genai.configure(api_key=api_key)
 
 # Initialize models
-model_generation = genai.GenerativeModel('gemini-2.5-flash')
-model_inspection = genai.GenerativeModel('gemini-2.5-flash')
+model_generation = genai.GenerativeModel('gemini-3.1-flash-lite-preview')
+model_inspection = genai.GenerativeModel('gemini-3.1-flash-lite-preview')
 
 def get_generation_prompt():
     return (
@@ -210,7 +210,7 @@ def main():
     parser.add_argument("--input", default="ed_augmented.jsonl", help="Input JSONL file")
     parser.add_argument("--output", default="ed_results.jsonl", help="Output JSONL file for results")
     parser.add_argument("--deltas", default="ed_deltas.jsonl", help="Output JSONL file for deltas")
-    parser.add_argument("--n", type=int, default=1000, help="Number of rows to process")
+    parser.add_argument("--n", type=int, default=250, help="Number of rows to process")
     args = parser.parse_args()
 
     # Determine already processed rows to support resuming
