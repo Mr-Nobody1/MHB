@@ -1,3 +1,7 @@
 # Ignore environment file and virtual environment directory
 .env
 .venv/
+
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/

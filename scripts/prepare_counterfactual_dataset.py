@@ -3,7 +3,18 @@ import json
 import uuid
 import re
 from collections import Counter
+from pathlib import Path
 from datasets import load_dataset
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_OUTPUT_PATH = PROJECT_ROOT / 'data' / 'input' / 'ed_augmented.jsonl'
+
+
+def resolve_path(path_str):
+    path = Path(path_str)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    return path
 
 def clean_text(text):
     if not text:
@@ -15,10 +26,12 @@ def clean_text(text):
 def main():
     parser = argparse.ArgumentParser(description="Prepare counterfactual fairness evaluation dataset using empathetic_dialogues")
     parser.add_argument("--n", type=int, default=3000, help="Number of base prompts to extract")
-    parser.add_argument("--out", type=str, default="ed_augmented.jsonl", help="Output JSONL file path")
+    parser.add_argument("--out", type=str, default=str(DEFAULT_OUTPUT_PATH), help="Output JSONL file path")
     parser.add_argument("--seed", type=int, default=None, help="Random seed for sampling")
     parser.add_argument("--min_chars", type=int, default=20, help="Minimum character length for prompts")
     args = parser.parse_args()
+    output_path = resolve_path(args.out)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     print("Loading facebook/empathetic_dialogues dataset...")
     ds = load_dataset("facebook/empathetic_dialogues", split="train", trust_remote_code=True)
@@ -117,8 +130,8 @@ def main():
                 results.append(record)
                 variant_counts[variant_label] += 1
 
-    print(f"Writing to {args.out}...")
-    with open(args.out, "w", encoding="utf-8") as f:
+    print(f"Writing to {output_path}...")
+    with output_path.open("w", encoding="utf-8") as f:
         for record in results:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 

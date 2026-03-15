@@ -3,12 +3,26 @@ import json
 import time
 import os
 from collections import defaultdict
+from pathlib import Path
 from dotenv import load_dotenv
 import google.generativeai as genai
 from google.generativeai.types import GenerationConfig
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_INPUT_PATH = PROJECT_ROOT / 'data' / 'input' / 'ed_augmented.jsonl'
+DEFAULT_OUTPUT_PATH = PROJECT_ROOT / 'data' / 'output' / 'gemini' / 'ed_results.jsonl'
+DEFAULT_DELTAS_PATH = PROJECT_ROOT / 'data' / 'output' / 'gemini' / 'ed_deltas.jsonl'
+
+
+def resolve_path(path_str):
+    path = Path(path_str)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    return path
+
+
 # Load environment variables
-load_dotenv()
+load_dotenv(PROJECT_ROOT / '.env')
 
 # Configure Gemini API
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -161,11 +175,14 @@ def compute_avg_bias(inspection_json):
 
 def compute_deltas(results_file, deltas_file):
     print("Computing counterfactual deltas...")
+    results_file = resolve_path(results_file)
+    deltas_file = resolve_path(deltas_file)
+    deltas_file.parent.mkdir(parents=True, exist_ok=True)
     
     group_data = defaultdict(dict)
     
     # Read results file to group by group_id
-    with open(results_file, 'r', encoding='utf-8') as f:
+    with results_file.open('r', encoding='utf-8') as f:
         for line in f:
             if not line.strip():
                 continue
@@ -199,7 +216,7 @@ def compute_deltas(results_file, deltas_file):
             deltas.append(delta_record)
             
     # Save to deltas file
-    with open(deltas_file, 'w', encoding='utf-8') as f:
+    with deltas_file.open('w', encoding='utf-8') as f:
         for delta in deltas:
             f.write(json.dumps(delta, ensure_ascii=False) + '\n')
             
@@ -207,16 +224,21 @@ def compute_deltas(results_file, deltas_file):
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate bias over demographic-augmented prompts")
-    parser.add_argument("--input", default="ed_augmented.jsonl", help="Input JSONL file")
-    parser.add_argument("--output", default="ed_results.jsonl", help="Output JSONL file for results")
-    parser.add_argument("--deltas", default="ed_deltas.jsonl", help="Output JSONL file for deltas")
+    parser.add_argument("--input", default=str(DEFAULT_INPUT_PATH), help="Input JSONL file")
+    parser.add_argument("--output", default=str(DEFAULT_OUTPUT_PATH), help="Output JSONL file for results")
+    parser.add_argument("--deltas", default=str(DEFAULT_DELTAS_PATH), help="Output JSONL file for deltas")
     parser.add_argument("--n", type=int, default=250, help="Number of rows to process")
     args = parser.parse_args()
+    input_path = resolve_path(args.input)
+    output_path = resolve_path(args.output)
+    deltas_path = resolve_path(args.deltas)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    deltas_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Determine already processed rows to support resuming
     processed_row_ids = set()
-    if os.path.exists(args.output):
-        with open(args.output, 'r', encoding='utf-8') as f:
+    if output_path.exists():
+        with output_path.open('r', encoding='utf-8') as f:
             for line in f:
                 if not line.strip():
                     continue
@@ -234,9 +256,9 @@ def main():
     processed_count = 0
     
     # Process input rows
-    with open(args.input, 'r', encoding='utf-8') as infile:
+    with input_path.open('r', encoding='utf-8') as infile:
         # Open output in append mode
-        with open(args.output, 'a', encoding='utf-8') as outfile:
+        with output_path.open('a', encoding='utf-8') as outfile:
             for i, line in enumerate(infile):
                 if processed_count >= args.n:
                     break
@@ -290,7 +312,7 @@ def main():
     print(f"Finished processing {processed_count} new rows. Total output rows: {len(processed_row_ids) + processed_count}")
     
     # Step 5: Compute counterfactual deltas
-    compute_deltas(args.output, args.deltas)
+    compute_deltas(output_path, deltas_path)
 
 if __name__ == "__main__":
     main()

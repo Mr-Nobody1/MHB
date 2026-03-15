@@ -1,13 +1,30 @@
 # Mental-health Bias (MHB) utilities
 
-This repository contains two small scripts to prepare a counterfactual dataset and evaluate bias in generated mental-wellbeing suggestions using Google Generative AI (Gemini).
+This repository contains dataset prep, evaluation scripts, and notebooks for bias analysis of generated mental-wellbeing suggestions across Gemini, LM Studio, and OpenAI workflows.
 
-**Files**
-- [prepare_counterfactual_dataset.py](prepare_counterfactual_dataset.py): extracts base prompts from `facebook/empathetic_dialogues`, injects demographic templates (gender, religion, culture) and writes `ed_augmented.jsonl`.
-- [evaluate_bias_pipeline.py](evaluate_bias_pipeline.py): generates short supportive suggestions with Gemini, inspects them for bias with a second Gemini call, computes average bias per example, and writes incremental results to `ed_results.jsonl` and deltas to `ed_deltas.jsonl`.
+## Project layout
 
-**Quick Setup**
-1. Create and activate a virtual environment (optional but recommended):
+- `scripts/`
+  - `prepare_counterfactual_dataset.py`: builds the augmented Empathetic Dialogues dataset.
+  - `evaluate_bias_pipeline.py`: runs the Gemini baseline evaluation pipeline.
+- `notebooks/`
+  - `openai_bias_pipeline.ipynb`: OpenAI-based bias pipeline.
+  - `local/`: LM Studio and local-model notebooks.
+  - `experiments/`: exploratory notebooks such as the iterative mitigation loop.
+- `data/input/`
+  - `ed_augmented.jsonl`: counterfactual input dataset.
+- `data/output/gemini/`
+  - Gemini pipeline outputs.
+- `data/output/lmstudio/`
+  - LM Studio pipeline outputs.
+- `data/output/openai/`
+  - OpenAI pipeline outputs.
+- `docs/`
+  - `paper.md`: project notes and write-up material.
+
+## Quick setup
+
+1. Create and activate a virtual environment:
 
 ```powershell
 python -m venv .venv
@@ -15,43 +32,39 @@ python -m venv .venv
 pip install --upgrade pip
 ```
 
-2. Install dependencies used by the scripts:
+2. Install the main dependencies:
 
 ```powershell
-pip install python-dotenv datasets google-generative-ai
+pip install python-dotenv datasets google-generative-ai openai pandas matplotlib seaborn
 ```
 
-3. Add your Gemini API key to a `.env` file in the repo root:
+3. Add the required keys to `.env` in the repo root:
 
 ```text
-GEMINI_API_KEY=your_actual_api_key_here
+GEMINI_API_KEY=your_gemini_key_here
+OPENAI_API_KEY=your_openai_key_here
+OPENAI_MODEL=gpt-5-mini
 ```
 
-Note: `.env` and `.venv` are already ignored in `.gitignore`.
+## Usage
 
-**Usage**
-- Prepare the counterfactual dataset (produces `ed_augmented.jsonl`):
+Prepare the counterfactual dataset:
 
 ```powershell
-python prepare_counterfactual_dataset.py --n 3000 --out ed_augmented.jsonl
+python scripts/prepare_counterfactual_dataset.py --n 3000
 ```
 
-- Run the bias evaluation pipeline (incremental; resumes if `ed_results.jsonl` exists):
+Run the Gemini evaluation pipeline:
 
 ```powershell
-python evaluate_bias_pipeline.py --input ed_augmented.jsonl --output ed_results.jsonl --deltas ed_deltas.jsonl --n 1000
+python scripts/evaluate_bias_pipeline.py --n 1000
 ```
 
-**Notes & Behavior**
-- `prepare_counterfactual_dataset.py` selects prompts from the `context` (or falls back to `prompt`) column of the Empathetic Dialogues dataset, enforces a minimum character length, and creates grouped variants using a shared `group_id` so counterfactuals align.
-- `evaluate_bias_pipeline.py`:
-  - Requires `GEMINI_API_KEY` in `.env`.
-  - Uses two Gemini models: one to generate suggestions and one to inspect for bias.
-  - Writes results incrementally and supports resuming by checking existing `row_id` values in the output file.
-  - Computes per-group deltas with `ed_deltas.jsonl`.
+Open the notebooks from `notebooks/` and run them from the top. They now resolve the project root automatically and read/write from `data/input/` and `data/output/...`.
 
-**Next steps you might want**
-- Add a `requirements.txt` or `pyproject.toml` for reproducible installs.
-- Add lightweight tests or a small example `ed_augmented.jsonl` for quick smoke runs.
+## Notes
 
-If you want, I can add `requirements.txt` and example commands or run a small end-to-end smoke test locally.
+- `scripts/prepare_counterfactual_dataset.py` writes to `data/input/ed_augmented.jsonl` by default.
+- `scripts/evaluate_bias_pipeline.py` writes to `data/output/gemini/` by default.
+- The OpenAI notebook writes to `data/output/openai/`.
+- The LM Studio notebooks write to `data/output/lmstudio/`.
