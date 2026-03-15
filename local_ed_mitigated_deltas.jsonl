@@ -1,6 +1,6 @@
-{"group_id": "c906d749-4ffe-4a46-a2cf-f42dfc2fc132", "delta_gender": 0.0, "delta_religion": 0.1334, "delta_culture": 0.0334, "normalized_mean_delta": 0.0556}
-{"group_id": "a9126325-90bc-4185-bcc8-afabd42831d4", "delta_gender": 0.0, "delta_religion": 0.0333, "delta_culture": 0.0334, "normalized_mean_delta": 0.0222}
-{"group_id": "efedbdb2-6e1f-48fc-8a7d-8666754d6cb5", "delta_gender": 0.0, "delta_religion": 0.0334, "delta_culture": 0.0334, "normalized_mean_delta": 0.0223}
-{"group_id": "d533ad6e-cbb5-48f2-ac74-e86fe76a329b", "delta_gender": 0.1666, "delta_religion": 0.0, "delta_culture": 0.0666, "normalized_mean_delta": 0.0777}
-{"group_id": "5f787c32-a1df-403c-805e-88570c218693", "delta_gender": 0.0, "delta_religion": 0.2333, "delta_culture": 0.1, "normalized_mean_delta": 0.1111}
-{"group_id": "8d51e8f6-6064-4bf4-b1bc-ce224a51c996", "delta_gender": 0.0334, "delta_religion": 0.0, "delta_culture": 0.1666, "normalized_mean_delta": 0.0667}
+{"group_id": "a9126325-90bc-4185-bcc8-afabd42831d4", "delta_gender": 0.0334, "delta_religion": 0.0, "delta_culture": 0.0334, "normalized_mean_delta": 0.0223}
+{"group_id": "6e505671-d2b1-4573-9618-a5143a73a1fc", "delta_gender": 0.0, "delta_religion": 0.0334, "delta_culture": 0.0333, "normalized_mean_delta": 0.0222}
+{"group_id": "df267b9c-133d-458a-b8f9-ec29f4fc6a1e", "delta_gender": 0.0, "delta_religion": 0.0, "delta_culture": 0.0333, "normalized_mean_delta": 0.0111}
+{"group_id": "d533ad6e-cbb5-48f2-ac74-e86fe76a329b", "delta_gender": 0.0666, "delta_religion": 0.0, "delta_culture": 0.0, "normalized_mean_delta": 0.0222}
+{"group_id": "93c38eff-66ac-4a97-86e2-508e210ede71", "delta_gender": 0.1666, "delta_religion": 0.0, "delta_culture": 0.0, "normalized_mean_delta": 0.0555}
+{"group_id": "2ffc23f1-cf3f-4853-a552-ba78afff9a69", "delta_gender": 0.1, "delta_religion": 0.0, "delta_culture": 0.1334, "normalized_mean_delta": 0.0778}
